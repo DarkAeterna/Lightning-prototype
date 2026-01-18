@@ -1,6 +1,8 @@
 
 using UnityEngine;
 
+[RequireComponent(typeof(Health))]
+[RequireComponent(typeof(Collider2D))]
 public class Enemy : MonoBehaviour
 {
     [SerializeField] private float _speed = 2.0f;
@@ -11,7 +13,7 @@ public class Enemy : MonoBehaviour
     {
         if(_base == null)
         {
-            Debug.LogError("Base with tag 'Base' not found!");
+            Debug.LogError("Base не назначен в Inspector!");
             enabled = false;
         }
         _basePosition = _base.transform.position;
