@@ -3,11 +3,11 @@ using UnityEngine;
 
 public class EnemyController : MonoBehaviour
 {
-    [SerializeField] private float speed = 2.0f;
+    [SerializeField] private float _speed;
     [SerializeField] private float border = -6.0f;
     void Start()
     {
-        
+        _speed = 2.0f;
     }
 
     // Update is called once per frame
@@ -15,7 +15,7 @@ public class EnemyController : MonoBehaviour
     {
         if(transform.position.x > border)
         {
-            transform.Translate(Vector3.left * speed * Time.deltaTime);
+            transform.Translate(Vector3.left * (_speed * Time.deltaTime));
         }
         
     }
