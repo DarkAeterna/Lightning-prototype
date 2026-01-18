@@ -5,41 +5,36 @@ using UnityEngine;
 public class EnemySpawner : MonoBehaviour
 {
     [SerializeField] private float _enemySpawnRate = 2.0f;
-    [SerializeField] private float _spawnPosX = 5.0f;
-    [SerializeField] private float _minSpawnPosY = -0.75f;
-    [SerializeField] private float _maxSpawnPosY = 6.0f;
-    [SerializeField] private GameObject [] _enemyPrefab;
-    [SerializeField] public int _waveCount = 1;
+    [SerializeField] private float _spawnPositionX = 5.0f;
+    [SerializeField] private float _minSpawnPositionY = -0.75f;
+    [SerializeField] private float _maxSpawnPositionY = 6.0f;
+    [SerializeField] private GameObject [] _enemyPrefabs;
+    [SerializeField] public int _waveCounter = 1;
     [SerializeField] public bool _isEnemyPhase;
     void Start()
     {
-        StartCoroutine(SpawnRoutine());
+        StartCoroutine(SpawnNext());
     }
 
-    // Update is called once per frame
-    void Update()
+    private void Spawn()
     {
-        
-    }
-
-    private void SpawnEnemy()
-    {
-        if(_enemyPrefab == null)
+        if(_enemyPrefabs == null)
         {
             Debug.LogError("Enemy prefab is empty");
         }
-        for(int i = 0; i < _waveCount; i++)
+
+        for(int i = 0; i < _waveCounter; i++)
         {
-            int _randomIndex = Random.Range(0, _enemyPrefab.Length);
-            Vector3 _randomSpawnPos = new Vector3(_spawnPosX, Random.Range(_minSpawnPosY, _maxSpawnPosY), 0);
-            Instantiate(_enemyPrefab[_randomIndex], _randomSpawnPos, Quaternion.identity);
+            int randomIndex = Random.Range(0, _enemyPrefabs.Length);
+            Vector3 _randomSpawnPos = new Vector3(_spawnPositionX, Random.Range(_minSpawnPositionY, _maxSpawnPositionY), 0);
+            Instantiate(_enemyPrefabs[randomIndex], _randomSpawnPos, Quaternion.identity);
         }
     }
-    private IEnumerator SpawnRoutine()
+    private IEnumerator SpawnNext()
     {
         while(_isEnemyPhase)
         {
-            SpawnEnemy();
+            Spawn();
             yield return new WaitForSeconds(_enemySpawnRate);
         }
     }
