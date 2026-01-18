@@ -25,8 +25,9 @@ namespace Buildings
 
         private void Awake()
         {
-            GetComponent<Rigidbody2D>().gravityScale = 0.0f;
-            
+            Rigidbody2D rigidbody2D = GetComponent<Rigidbody2D>();
+            rigidbody2D.gravityScale = 0.0f;
+
             _perTouchChargePercent = 25;
             _maxCharge = 100f;
             
