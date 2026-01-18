@@ -3,20 +3,28 @@ using UnityEngine;
 
 public class EnemyController : MonoBehaviour
 {
-    [SerializeField] private float _speed;
-    [SerializeField] private float border = -6.0f;
+    //TODO add Health script
+    //TODO add Attacker script
+    [SerializeField] private float _speed = 2.0f;
+    private Vector3 basePosition;
+
     void Start()
     {
-        _speed = 2.0f;
+        GameObject baseObject = GameObject.FindWithTag("Base");
+        if(baseObject == null)
+        {
+            Debug.LogError("Base with tag 'Base' not found!");
+            enabled = false;
+        }
+        basePosition = baseObject.transform.position;
     }
 
-    // Update is called once per frame
     void Update()
     {
-        if(transform.position.x > border)
-        {
-            transform.Translate(Vector3.left * (_speed * Time.deltaTime));
-        }
-        
+        Vector3 direction = (basePosition - transform.position).normalized;
+        transform.Translate(direction * (_speed * Time.deltaTime));
     }
+
+    //On Collisionenter(base)
+        //Attack()
 }
