@@ -1,0 +1,25 @@
+
+using UnityEngine;
+
+public class Enemy : MonoBehaviour
+{
+    [SerializeField] private float _speed = 2.0f;
+    [SerializeField] private Base _base;
+    private Vector3 _basePosition;
+
+    private void Start()
+    {
+        if(_base == null)
+        {
+            Debug.LogError("Base with tag 'Base' not found!");
+            enabled = false;
+        }
+        _basePosition = _base.transform.position;
+    }
+
+    private void Update()
+    {
+        Vector3 direction = (_basePosition - transform.position).normalized;
+        transform.Translate(direction * (_speed * Time.deltaTime));
+    }
+}
