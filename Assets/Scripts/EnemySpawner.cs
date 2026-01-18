@@ -8,7 +8,7 @@ public class EnemySpawner : MonoBehaviour
     [SerializeField] private float _spawnPositionX = 5.0f;
     [SerializeField] private float _minSpawnPositionY = -0.75f;
     [SerializeField] private float _maxSpawnPositionY = 6.0f;
-    [SerializeField] private GameObject [] _enemyPrefabs;
+    [SerializeField] private GameObject[] _enemyPrefabs;
     [SerializeField] public int _waveCounter = 1;
     [SerializeField] public bool _isEnemyPhase;
     void Start()
