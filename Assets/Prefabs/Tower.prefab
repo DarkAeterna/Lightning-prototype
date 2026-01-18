@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 2142378718519731887}
   - component: {fileID: 6045183350709470631}
   - component: {fileID: 5352675416474836694}
+  - component: {fileID: -8945859847121929858}
   m_Layer: 0
   m_Name: Tower
   m_TagString: Untagged
@@ -138,3 +139,15 @@ BoxCollider2D:
   m_AutoTiling: 0
   m_Size: {x: 1, y: 1}
   m_EdgeRadius: 0
+--- !u!114 &-8945859847121929858
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4062812976840048494}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6c39ffece7b4fb84e8fffcaa1ad425d3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Buildings.Building
