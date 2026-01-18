@@ -13,7 +13,7 @@ public class Enemy : MonoBehaviour
     {
         if(_base == null)
         {
-            Debug.LogError("Base with tag 'Base' not found!");
+            Debug.LogError("Base не назначен в Inspector!");
             enabled = false;
         }
         _basePosition = _base.transform.position;
