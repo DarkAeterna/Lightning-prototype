@@ -1,4 +1,4 @@
-
+using Logic;
 using UnityEngine;
 
 [RequireComponent(typeof(Health))]
@@ -7,7 +7,7 @@ using UnityEngine;
 public class Base : MonoBehaviour
 {
     private Health _health;
-    
+
     private void Awake()
     {
         _health = GetComponent<Health>();

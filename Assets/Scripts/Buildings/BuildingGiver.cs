@@ -11,15 +11,15 @@ namespace Buildings
         [SerializeField] private HorizontalLayoutGroup _group;
         [SerializeField] private Button _buttonPrefab;
         [SerializeField] private Building[] _buildings;
-        
+
         [SerializeField] private BuildingSpawner _buildingSpawner;
 
         public event Action<Building> BuildingSelected;
-    
+
         private readonly List<Button> _spawnedButtons = new List<Button>();
-        
+
         private Building _currentBuilding;
-        
+
         public Building CurrentBuilding => _currentBuilding;
 
         private void Awake()
@@ -42,38 +42,36 @@ namespace Buildings
         [ContextMenu("Show")]
         public void Show()
         {
-            Building[] buildingsToShow = Choose(Random.Range(1, 4 + 1));
+            int buildingCount = 2;
+            Building[] toShowBuildings = Choose(buildingCount);
             gameObject.SetActive(true);
 
             ClearButtons();
 
-            for (int i = 0; i < buildingsToShow.Length; i++)
+            for (int i = 0; i < toShowBuildings.Length; i++)
             {
-                Building building = buildingsToShow[i];
+                Building building = toShowBuildings[i];
 
                 Button buttonInstance = Instantiate(_buttonPrefab, _group.transform);
                 _spawnedButtons.Add(buttonInstance);
 
                 Text label = buttonInstance.GetComponentInChildren<Text>(true);
-            
+
                 if (label != null)
                 {
                     label.text = GetBuildingDisplayName(building);
                 }
 
-                buttonInstance.onClick.AddListener(() =>
-                {
-                    BuildingSelected?.Invoke(building);
-                });
+                buttonInstance.onClick.AddListener(() => { BuildingSelected?.Invoke(building); });
             }
         }
-    
+
         private void ClearButtons()
         {
             for (int i = 0; i < _spawnedButtons.Count; i++)
             {
                 Button button = _spawnedButtons[i];
-            
+
                 if (button == null)
                 {
                     continue;
@@ -92,12 +90,12 @@ namespace Buildings
 
             for (int i = 0; i < buildings.Length; i++)
             {
-                buildings[i] =  _buildings[Random.Range(0, _buildings.Length)];
+                buildings[i] = _buildings[Random.Range(0, _buildings.Length)];
             }
-        
+
             return buildings;
         }
-        
+
         private void ResetSelection()
         {
             _currentBuilding = null;
@@ -108,14 +106,14 @@ namespace Buildings
             _currentBuilding = building;
             Show();
         }
-    
+
         private string GetBuildingDisplayName(Building building)
         {
             if (building == null)
             {
                 return "Unknown";
             }
-        
+
             return building.name;
         }
     }

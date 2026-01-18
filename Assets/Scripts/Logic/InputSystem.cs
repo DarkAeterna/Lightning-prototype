@@ -1,22 +1,21 @@
 using System;
 using UnityEngine;
 
-public class InputSystem : MonoBehaviour
+namespace Logic
 {
-    [Header("Buttons")]
-    [SerializeField]
-    private int _mouseButton = 0;
-
-    public event Action<Vector3> MouseClicked;
-    
-    private void Update()
+    public class InputSystem : MonoBehaviour
     {
-        if (Input.GetMouseButton(_mouseButton))
+        [Header("Buttons")] [SerializeField] private int _mouseButton = 0;
+
+        public event Action<Vector3> MouseClicked;
+
+        private void Update()
         {
-            Vector3 mousePosition = Input.mousePosition;
-            MouseClicked?.Invoke(mousePosition);
+            if (Input.GetMouseButton(_mouseButton))
+            {
+                Vector3 mousePosition = Input.mousePosition;
+                MouseClicked?.Invoke(mousePosition);
+            }
         }
-        
-        
     }
 }

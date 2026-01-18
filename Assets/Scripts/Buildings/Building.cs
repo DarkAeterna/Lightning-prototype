@@ -11,16 +11,16 @@ namespace Buildings
     public class Building : MonoBehaviour
     {
         [SerializeField, Min(1)] private int _attackCooldown;
-        
+
         private int _perTouchChargePercent;
         private float _maxCharge;
         private float _charge;
-        
+
         private bool _isTouched;
-        
+
         private Attacker _attacker;
         private WaitForSeconds _waitForSeconds;
-        
+
         private IDamagable _target;
 
         private void Awake()
@@ -30,7 +30,7 @@ namespace Buildings
 
             _perTouchChargePercent = 25;
             _maxCharge = 100f;
-            
+
             _attacker = GetComponent<Attacker>();
             _waitForSeconds = new WaitForSeconds(_attackCooldown);
         }

@@ -1,34 +1,37 @@
 using Interfaces;
 using UnityEngine;
 
-public class Health : MonoBehaviour, IDamagable
+namespace Logic
 {
-    private readonly float _maxValue = 100f;
-    private float _value;
-
-    private void Awake()
+    public class Health : MonoBehaviour, IDamagable
     {
-        _value = _maxValue;
-    }
+        private readonly float _maxValue = 100f;
+        private float _value;
 
-    public bool TryTakeDamage(float damage)
-    {
-        if (damage <= 0f)
+        private void Awake()
         {
-            return false;
+            _value = _maxValue;
         }
-        
-        float newValue = _value - damage;
 
-        if (newValue < 0f)
+        public bool TryTakeDamage(float damage)
         {
-            Destroy(gameObject);
-        }
-        else
-        {
-            _value = newValue;
-        }
+            if (damage <= 0f)
+            {
+                return false;
+            }
         
-        return true;
+            float newValue = _value - damage;
+
+            if (newValue < 0f)
+            {
+                Destroy(gameObject);
+            }
+            else
+            {
+                _value = newValue;
+            }
+        
+            return true;
+        }
     }
 }

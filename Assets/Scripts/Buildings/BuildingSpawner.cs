@@ -1,4 +1,5 @@
 using System;
+using Logic;
 using UnityEngine;
 
 namespace Buildings
@@ -8,9 +9,9 @@ namespace Buildings
         [SerializeField] private InputSystem _inputSystem;
         [SerializeField] private FieldGrid _fieldGrid;
         [SerializeField] private BuildingGiver _buildingGiver;
-    
+
         private Camera _camera;
-        
+
         public event Action Spawned;
 
         private void Awake()
@@ -43,14 +44,14 @@ namespace Buildings
             {
                 return;
             }
-        
+
             bool canGetCell = _fieldGrid.TryGetCellFromWorldPosition(worldPoint, out Vector2Int cell);
 
             if (canGetCell == false)
             {
                 return;
             }
-        
+
             _fieldGrid.TrySpawn(building, cell);
             Spawned?.Invoke();
         }

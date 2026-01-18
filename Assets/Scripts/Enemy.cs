@@ -1,4 +1,4 @@
-
+using Logic;
 using UnityEngine;
 
 [RequireComponent(typeof(Health))]
@@ -11,11 +11,12 @@ public class Enemy : MonoBehaviour
 
     private void Start()
     {
-        if(_base == null)
+        if (_base == null)
         {
             Debug.LogError("Base не назначен в Inspector!");
             enabled = false;
         }
+
         _basePosition = _base.transform.position;
     }
 

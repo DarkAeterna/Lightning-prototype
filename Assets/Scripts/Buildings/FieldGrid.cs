@@ -1,5 +1,3 @@
-using System;
-using System.Collections.Generic;
 using UnityEngine;
 
 namespace Buildings
@@ -12,7 +10,7 @@ namespace Buildings
 
         [SerializeField, Min(1)] private int _width = 10;
         [SerializeField, Min(1)] private int _height = 10;
-        
+
         private Building[,] _field;
 
         private void Awake()
@@ -42,22 +40,22 @@ namespace Buildings
         {
             Vector3 localPosition = transform.InverseTransformPoint(worldPoint);
 
-            float halfWidth  = _width * _cellSize * 0.5f;
+            float halfWidth = _width * _cellSize * 0.5f;
             float halfHeight = _height * _cellSize * 0.5f;
 
             return localPosition.x >= -halfWidth &&
-                   localPosition.x <  halfWidth &&
+                   localPosition.x < halfWidth &&
                    localPosition.y >= -halfHeight &&
-                   localPosition.y <  halfHeight;
+                   localPosition.y < halfHeight;
         }
-        
+
         public bool TryGetCellFromWorldPosition(Vector3 worldPosition, out Vector2Int cell)
         {
             cell = default;
 
             Vector3 localPosition = transform.InverseTransformPoint(worldPosition);
 
-            float halfWidth  = _width * _cellSize * 0.5f;
+            float halfWidth = _width * _cellSize * 0.5f;
             float halfHeight = _height * _cellSize * 0.5f;
 
             float shiftedX = localPosition.x + halfWidth;
@@ -77,7 +75,7 @@ namespace Buildings
 
         private Vector3 TranslateCellToLocalCenter(Vector2Int cell)
         {
-            float halfWidth  = _width * _cellSize * 0.5f;
+            float halfWidth = _width * _cellSize * 0.5f;
             float halfHeight = _height * _cellSize * 0.5f;
 
             float x = (cell.x + 0.5f) * _cellSize - halfWidth;
@@ -98,17 +96,17 @@ namespace Buildings
                 return;
             }
 
-            float halfWidth  = _width * _cellSize * 0.5f;
+            float halfWidth = _width * _cellSize * 0.5f;
             float halfHeight = _height * _cellSize * 0.5f;
 
             Matrix4x4 previousMatrix = Gizmos.matrix;
             Gizmos.matrix = transform.localToWorldMatrix;
             Gizmos.color = Color.green;
 
-            Vector3 bottomLeft  = new Vector3(-halfWidth, -halfHeight, 0.0f);
-            Vector3 bottomRight = new Vector3( halfWidth, -halfHeight, 0.0f);
-            Vector3 topRight    = new Vector3( halfWidth,  halfHeight, 0.0f);
-            Vector3 topLeft     = new Vector3(-halfWidth,  halfHeight, 0.0f);
+            Vector3 bottomLeft = new Vector3(-halfWidth, -halfHeight, 0.0f);
+            Vector3 bottomRight = new Vector3(halfWidth, -halfHeight, 0.0f);
+            Vector3 topRight = new Vector3(halfWidth, halfHeight, 0.0f);
+            Vector3 topLeft = new Vector3(-halfWidth, halfHeight, 0.0f);
 
             Gizmos.DrawLine(bottomLeft, bottomRight);
             Gizmos.DrawLine(bottomRight, topRight);

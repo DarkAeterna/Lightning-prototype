@@ -10,7 +10,7 @@ namespace Logic
         [SerializeField, Min(1)] private float _damageRadius;
 
         private CircleCollider2D _damageCollider;
-        
+
         private void Awake()
         {
             _damageCollider = GetComponent<CircleCollider2D>();

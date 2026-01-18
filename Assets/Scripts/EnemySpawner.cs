@@ -1,4 +1,3 @@
-
 using System.Collections;
 using UnityEngine;
 
@@ -11,6 +10,7 @@ public class EnemySpawner : MonoBehaviour
     [SerializeField] private GameObject[] _enemyPrefabs;
     [SerializeField] public int _waveCounter = 1;
     [SerializeField] public bool _isEnemyPhase;
+
     void Start()
     {
         StartCoroutine(SpawnNext());
@@ -18,21 +18,23 @@ public class EnemySpawner : MonoBehaviour
 
     private void Spawn()
     {
-        if(_enemyPrefabs == null)
+        if (_enemyPrefabs == null)
         {
             Debug.LogError("Enemy prefab is empty");
         }
 
-        for(int i = 0; i < _waveCounter; i++)
+        for (int i = 0; i < _waveCounter; i++)
         {
             int randomIndex = Random.Range(0, _enemyPrefabs.Length);
-            Vector3 _randomSpawnPos = new Vector3(_spawnPositionX, Random.Range(_minSpawnPositionY, _maxSpawnPositionY), 0);
+            Vector3 _randomSpawnPos =
+                new Vector3(_spawnPositionX, Random.Range(_minSpawnPositionY, _maxSpawnPositionY), 0);
             Instantiate(_enemyPrefabs[randomIndex], _randomSpawnPos, Quaternion.identity);
         }
     }
+
     private IEnumerator SpawnNext()
     {
-        while(_isEnemyPhase)
+        while (_isEnemyPhase)
         {
             Spawn();
             yield return new WaitForSeconds(_enemySpawnRate);
