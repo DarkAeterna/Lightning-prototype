@@ -1,119 +1,152 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace Buildings
 {
     public class FieldGrid : MonoBehaviour
     {
-        [Header("Grid settings")]
-        [SerializeField]
-        private float _cellSize = 1.0f;
+        [Header("Field bounds")]
+        [Tooltip("Коллайдер зоны, внутри которой можно строить. IsTrigger может быть true.")]
+        [SerializeField] private Collider2D _areaCollider;
 
-        [SerializeField, Min(1)] private int _width = 10;
-        [SerializeField, Min(1)] private int _height = 10;
+        [Header("Overlap")]
+        [Tooltip("Слои, в которых находятся коллайдеры уже построенных зданий.")]
+        [SerializeField] private LayerMask _buildingsMask = ~0;
 
-        private Building[,] _field;
+        private readonly List<Building> _placedBuildings = new List<Building>();
 
         private void Awake()
         {
-            _field = new Building[_height, _width];
+            if (_areaCollider == null)
+            {
+                _areaCollider = GetComponent<Collider2D>();
+            }
         }
 
-        public bool TrySpawn(Building buildingPrefab, Vector2Int position)
+        public bool CanPlace(Building buildingPrefab, Vector3 worldPosition, float rotationZ, float extraSeparation)
         {
             if (buildingPrefab == null)
             {
                 return false;
             }
 
-            Vector3 localPosition = TranslateCellToLocalCenter(position);
-            Quaternion rotation = Quaternion.identity;
-
-            Building building = Instantiate(buildingPrefab, transform);
-            building.transform.localPosition = localPosition;
-            building.transform.localRotation = rotation;
-
-            _field[position.y, position.x] = building;
-            return true;
-        }
-
-        public bool IsInside(Vector3 worldPoint)
-        {
-            Vector3 localPosition = transform.InverseTransformPoint(worldPoint);
-
-            float halfWidth = _width * _cellSize * 0.5f;
-            float halfHeight = _height * _cellSize * 0.5f;
-
-            return localPosition.x >= -halfWidth &&
-                   localPosition.x < halfWidth &&
-                   localPosition.y >= -halfHeight &&
-                   localPosition.y < halfHeight;
-        }
-
-        public bool TryGetCellFromWorldPosition(Vector3 worldPosition, out Vector2Int cell)
-        {
-            cell = default;
-
-            Vector3 localPosition = transform.InverseTransformPoint(worldPosition);
-
-            float halfWidth = _width * _cellSize * 0.5f;
-            float halfHeight = _height * _cellSize * 0.5f;
-
-            float shiftedX = localPosition.x + halfWidth;
-            float shiftedY = localPosition.y + halfHeight;
-
-            int x = Mathf.FloorToInt(shiftedX / _cellSize);
-            int y = Mathf.FloorToInt(shiftedY / _cellSize);
-
-            if (x < 0 || x >= _width || y < 0 || y >= _height)
+            if (_areaCollider == null)
             {
                 return false;
             }
 
-            cell = new Vector2Int(x, y);
+            if (!TryGetPrefabBox(buildingPrefab, out BoxCollider2D prefabBox))
+            {
+                return false;
+            }
+
+            if (!IsBoxInsideArea(prefabBox, worldPosition, rotationZ))
+            {
+                return false;
+            }
+
+            if (IsOverlapping(prefabBox, worldPosition, rotationZ, extraSeparation))
+            {
+                return false;
+            }
+
             return true;
         }
 
-        private Vector3 TranslateCellToLocalCenter(Vector2Int cell)
+        public bool TryPlace(Building buildingPrefab, Vector3 worldPosition, float rotationZ, float extraSeparation, out Building placedBuilding)
         {
-            float halfWidth = _width * _cellSize * 0.5f;
-            float halfHeight = _height * _cellSize * 0.5f;
+            placedBuilding = null;
 
-            float x = (cell.x + 0.5f) * _cellSize - halfWidth;
-            float y = (cell.y + 0.5f) * _cellSize - halfHeight;
-
-            return new Vector3(x, y, 0.0f);
-        }
-
-        private void OnDrawGizmosSelected()
-        {
-            DrawGizmos();
-        }
-
-        private void DrawGizmos()
-        {
-            if (_width <= 0 || _height <= 0 || _cellSize <= 0.0f)
+            if (!CanPlace(buildingPrefab, worldPosition, rotationZ, extraSeparation))
             {
-                return;
+                return false;
             }
 
-            float halfWidth = _width * _cellSize * 0.5f;
-            float halfHeight = _height * _cellSize * 0.5f;
+            Quaternion rotation = Quaternion.Euler(0.0f, 0.0f, rotationZ);
 
-            Matrix4x4 previousMatrix = Gizmos.matrix;
-            Gizmos.matrix = transform.localToWorldMatrix;
-            Gizmos.color = Color.green;
+            Building instance = Instantiate(buildingPrefab, transform);
+            instance.transform.position = new Vector3(worldPosition.x, worldPosition.y, instance.transform.position.z);
+            instance.transform.rotation = rotation;
 
-            Vector3 bottomLeft = new Vector3(-halfWidth, -halfHeight, 0.0f);
-            Vector3 bottomRight = new Vector3(halfWidth, -halfHeight, 0.0f);
-            Vector3 topRight = new Vector3(halfWidth, halfHeight, 0.0f);
-            Vector3 topLeft = new Vector3(-halfWidth, halfHeight, 0.0f);
+            _placedBuildings.Add(instance);
+            placedBuilding = instance;
 
-            Gizmos.DrawLine(bottomLeft, bottomRight);
-            Gizmos.DrawLine(bottomRight, topRight);
-            Gizmos.DrawLine(topRight, topLeft);
-            Gizmos.DrawLine(topLeft, bottomLeft);
+            return true;
+        }
 
-            Gizmos.matrix = previousMatrix;
+        public IReadOnlyList<Building> GetPlacedBuildings()
+        {
+            return _placedBuildings;
+        }
+
+        private bool TryGetPrefabBox(Building buildingPrefab, out BoxCollider2D box)
+        {
+            box = buildingPrefab.GetComponentInChildren<BoxCollider2D>(true);
+            return box != null;
+        }
+
+        private bool IsOverlapping(BoxCollider2D prefabBox, Vector3 worldPosition, float rotationZ, float extraSeparation)
+        {
+            Quaternion rotation = Quaternion.Euler(0.0f, 0.0f, rotationZ);
+
+            Vector2 scaledSize = GetScaledSize(prefabBox);
+            Vector2 sizeWithSeparation = scaledSize + Vector2.one * extraSeparation * 2.0f;
+
+            Vector2 center = GetWorldCenter(prefabBox, worldPosition, rotation);
+
+            // Важно: OverlapBox вернет и коллайдеры "preview", если они включены.
+            // Мы preview будем делать без коллайдеров — тогда всё ок.
+            Collider2D hit = Physics2D.OverlapBox(center, sizeWithSeparation, rotationZ, _buildingsMask);
+            return hit != null;
+        }
+
+        private bool IsBoxInsideArea(BoxCollider2D prefabBox, Vector3 worldPosition, float rotationZ)
+        {
+            Quaternion rotation = Quaternion.Euler(0.0f, 0.0f, rotationZ);
+
+            Vector2 scaledSize = GetScaledSize(prefabBox);
+            Vector2 half = scaledSize * 0.5f;
+
+            Vector2 center = GetWorldCenter(prefabBox, worldPosition, rotation);
+
+            Vector2[] corners =
+            {
+                center + (Vector2)(rotation * new Vector3(-half.x, -half.y, 0.0f)),
+                center + (Vector2)(rotation * new Vector3( half.x, -half.y, 0.0f)),
+                center + (Vector2)(rotation * new Vector3( half.x,  half.y, 0.0f)),
+                center + (Vector2)(rotation * new Vector3(-half.x,  half.y, 0.0f))
+            };
+
+            for (int i = 0; i < corners.Length; i++)
+            {
+                if (!_areaCollider.OverlapPoint(corners[i]))
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        private Vector2 GetScaledSize(BoxCollider2D box)
+        {
+            Vector3 lossyScale = box.transform.lossyScale;
+
+            return new Vector2(
+                box.size.x * Mathf.Abs(lossyScale.x),
+                box.size.y * Mathf.Abs(lossyScale.y)
+            );
+        }
+
+        private Vector2 GetWorldCenter(BoxCollider2D prefabBox, Vector3 worldPosition, Quaternion rotation)
+        {
+            // prefabBox.offset задан в локальных координатах объекта с коллайдером.
+            // Для проверки размещения мы предполагаем, что корень префаба совпадает с pivot размещения.
+            // Поэтому offset просто поворачиваем и прибавляем к worldPosition.
+            Vector2 offset = prefabBox.offset;
+            Vector2 rotatedOffset = (Vector2)(rotation * (Vector3)offset);
+
+            return new Vector2(worldPosition.x, worldPosition.y) + rotatedOffset;
         }
     }
 }
